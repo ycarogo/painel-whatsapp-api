@@ -1,0 +1,47 @@
+<div class="p-6">
+    <!-- Barra de busca e select -->
+    <div class="flex items-center justify-between mb-6">
+        <!-- Campo de busca -->
+        <div class="relative w-full max-w-md">
+            <input 
+            type="text" 
+            [(ngModel)]="searchTerm" 
+            (input)="filterInstances()" 
+            placeholder="Buscar instâncias..." 
+            class="w-full px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <span class="absolute inset-y-0 right-0 flex items-center pr-3">
+                <svg class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+            </span>
+        </div>
+  
+      <!-- Select -->
+        <select 
+            [(ngModel)]="selectedFilter" 
+            (change)="filterInstances()" 
+            class="ml-4 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="all">Todas</option>
+            <option value="active">Ativas</option>
+            <option value="inactive">Inativas</option>
+        </select>
+    </div>
+  
+    <!-- Listagem de cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div *ngFor="let instance of filteredInstances" class="bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
+            <div class="p-4">
+                <h2 class="text-lg font-semibold text-gray-800 dark:text-white">{{ instance.name }}</h2>
+                <p class="mt-2 text-gray-600 dark:text-gray-300">{{ instance.description }}</p>
+                <span class="inline-block mt-2 px-2 py-1 text-sm font-medium rounded-full {{ instance.status === 'active' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' }}">
+                    {{ instance.status === 'active' ? 'Ativa' : 'Inativa' }}
+                </span>
+            </div>
+        </div>
+    </div>
+  
+    <!-- Mensagem caso não haja resultados -->
+    <div *ngIf="filteredInstances.length === 0" class="text-center text-gray-500 dark:text-gray-400 mt-6">
+        Nenhuma instância encontrada.
+    </div>
+</div>
