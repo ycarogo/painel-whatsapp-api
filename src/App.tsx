@@ -27,9 +27,6 @@ import {
   Trash2,
   Plus,
   Database,
-  Bot,
-  Globe,
-  MessageSquare,
 } from "lucide-react";
 import type { Instance } from "./lib/utils";
 import { mockInstances } from "./mockInstances";
@@ -64,14 +61,6 @@ const statusConfig = {
     textColor: "text-yellow-700",
     bgColor: "bg-yellow-50",
   },
-};
-
-const typeIcons = {
-  whatsapp: MessageSquare,
-  web: Globe,
-  facebook: MessageSquare,
-  telegram: Bot,
-  api: Database,
 };
 
 function App() {
