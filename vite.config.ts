@@ -26,6 +26,19 @@ export default defineConfig(({ mode }) => {
           target: env.VITE_API_URL,
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api/, ""),
+          secure: false,
+          ws: true,
+        },
+      },
+    },
+    preview: {
+      proxy: {
+        "/api": {
+          target: env.VITE_API_URL,
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api/, ""),
+          secure: false,
+          ws: true,
         },
       },
     },

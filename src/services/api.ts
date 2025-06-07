@@ -15,10 +15,7 @@ export const GetAllInstances = async () => {
   }
 
   try {
-    // Em produção, usa a URL completa da API
-    const baseUrl = import.meta.env.PROD ? apiUrl : "/api";
-
-    const response = await fetch(`${baseUrl}/instance/fetchInstances`, {
+    const response = await fetch("/api/instance/fetchInstances", {
       headers: {
         "Content-Type": "application/json",
         apikey: apiKey,
