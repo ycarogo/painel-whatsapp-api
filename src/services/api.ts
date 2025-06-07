@@ -1,22 +1,21 @@
-export const SetDataApiStorage = async (apiUrl: string, apiKey: string) => {
-  localStorage.setItem("apiUrl", apiUrl);
+export const SetDataApiStorage = async (apiKey: string) => {
   localStorage.setItem("apiKey", apiKey);
 };
 
 export const GetDataApiStorage = async () => {
-  const apiUrl = localStorage.getItem("apiUrl");
   const apiKey = localStorage.getItem("apiKey");
-  return { apiUrl, apiKey };
+  return { apiKey };
 };
 
 export const GetAllInstances = async () => {
-  const { apiUrl, apiKey } = await GetDataApiStorage();
-  if (!apiUrl || !apiKey) {
+  const { apiKey } = await GetDataApiStorage();
+  if (!apiKey) {
     throw new Error("Credenciais da API não encontradas");
   }
 
   try {
-    const response = await fetch(`${apiUrl}/instance/fetchInstances`, {
+    // Usando o proxy configurado no Vite
+    const response = await fetch(`/api/instance/fetchInstances`, {
       headers: {
         "Content-Type": "application/json",
         apikey: apiKey,

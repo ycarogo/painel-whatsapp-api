@@ -1,9 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -18,58 +16,21 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Separator } from "@/components/ui/separator";
-import {
-  Search,
-  Settings,
-  Play,
-  Square,
-  Trash2,
-  Plus,
-  Database,
-} from "lucide-react";
+import { Search, Settings, Plus, Database } from "lucide-react";
 import type { Instance } from "./lib/utils";
-import { mockInstances } from "./mockInstances";
 import {
   GetAllInstances,
   GetDataApiStorage,
   SetDataApiStorage,
 } from "./services/api";
-
-const statusConfig = {
-  ONLINE: {
-    label: "Conectado",
-    color: "bg-green-500",
-    textColor: "text-green-700",
-    bgColor: "bg-green-50",
-  },
-  OFFLINE: {
-    label: "Desconectado",
-    color: "bg-red-500",
-    textColor: "text-red-700",
-    bgColor: "bg-red-50",
-  },
-  ERROR: {
-    label: "Erro",
-    color: "bg-red-500",
-    textColor: "text-red-700",
-    bgColor: "bg-red-50",
-  },
-  CONNECTING: {
-    label: "Conectando",
-    color: "bg-yellow-500",
-    textColor: "text-yellow-700",
-    bgColor: "bg-yellow-50",
-  },
-};
+import { InstanceCard } from "./components/InstanceCard";
+import { ConfApiKeyForm } from "./components/ConfApiKeyForm";
 
 function App() {
-  const [instances, setInstances] = useState<Instance[]>(mockInstances);
-  const [filteredInstances, setFilteredInstances] =
-    useState<Instance[]>(mockInstances);
+  const [instances, setInstances] = useState<Instance[]>([]);
+  const [filteredInstances, setFilteredInstances] = useState<Instance[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("ONLINE");
-  const [apiUrl, setApiUrl] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("TODOS");
   const [apiKey, setApiKey] = useState("");
   const [isConfigured, setIsConfigured] = useState(false);
   const [showConfig, setShowConfig] = useState(false);
@@ -77,16 +38,14 @@ function App() {
 
   const fetchInstances = async () => {
     try {
-      const { apiUrl, apiKey } = await GetDataApiStorage();
+      const { apiKey } = await GetDataApiStorage();
 
-      if (!apiUrl || !apiKey) {
+      if (!apiKey) {
         setIsConfigured(false);
         setShowConfig(true);
-        setErrorMessage("Configure a URL e chave da API para continuar");
+        setErrorMessage("Configure a chave da API para continuar");
         return;
       }
-
-      setApiUrl(apiUrl);
       setApiKey(apiKey);
       setIsConfigured(true);
       setErrorMessage(null);
@@ -123,7 +82,7 @@ function App() {
       );
     }
 
-    if (statusFilter !== "ONLINE") {
+    if (statusFilter !== "TODOS") {
       filtered = filtered.filter(
         (instance) => instance.connectionStatus === statusFilter
       );
@@ -133,12 +92,10 @@ function App() {
   }, [instances, searchTerm, statusFilter]);
 
   const handleConnect = () => {
-    if (apiUrl && apiKey) {
-      console.log("apiUrl", apiUrl);
-      console.log("apiKey", apiKey);
-      SetDataApiStorage(apiUrl, apiKey);
-      setIsConfigured(true);
+    if (apiKey) {
+      SetDataApiStorage(apiKey);
       setShowConfig(false);
+      fetchInstances();
     }
   };
 
@@ -175,42 +132,15 @@ function App() {
               Configuração da API
             </h1>
             <p className="text-gray-400">
-              Configure a URL e chave da API para continuar
+              Configure a chave da API para continuar
             </p>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="apiUrl" className="text-white">
-                URL da API
-              </Label>
-              <Input
-                id="apiUrl"
-                placeholder="https://api.exemplo.com"
-                value={apiUrl}
-                onChange={(e) => setApiUrl(e.target.value)}
-                className="bg-gray-700 border-gray-600 text-white placeholder-gray-400"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="apiKey" className="text-white">
-                Chave da API
-              </Label>
-              <Input
-                id="apiKey"
-                type="password"
-                placeholder="Sua chave da API"
-                value={apiKey}
-                onChange={(e) => setApiKey(e.target.value)}
-                className="bg-gray-700 border-gray-600 text-white placeholder-gray-400"
-              />
-            </div>
-            <Button
-              onClick={handleConnect}
-              className="w-full bg-blue-600 hover:bg-blue-700"
-              disabled={!apiUrl || !apiKey}
-            >
-              Conectar
-            </Button>
+            <ConfApiKeyForm
+              apiKey={apiKey}
+              setApiKey={setApiKey}
+              handleConnect={handleConnect}
+            />
           </CardContent>
         </Card>
       </div>
@@ -250,35 +180,11 @@ function App() {
                     </div>
                   )}
                   <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="newApiUrl" className="text-white">
-                        URL da API
-                      </Label>
-                      <Input
-                        id="newApiUrl"
-                        value={apiUrl}
-                        onChange={(e) => setApiUrl(e.target.value)}
-                        className="bg-gray-700 border-gray-600 text-white"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="newApiKey" className="text-white">
-                        Chave da API
-                      </Label>
-                      <Input
-                        id="newApiKey"
-                        type="password"
-                        value={apiKey}
-                        onChange={(e) => setApiKey(e.target.value)}
-                        className="bg-gray-700 border-gray-600 text-white"
-                      />
-                    </div>
-                    <Button
-                      onClick={() => setShowConfig(false)}
-                      className="w-full"
-                    >
-                      Salvar
-                    </Button>
+                    <ConfApiKeyForm
+                      apiKey={apiKey}
+                      setApiKey={setApiKey}
+                      handleConnect={handleConnect}
+                    />
                   </div>
                 </DialogContent>
               </Dialog>
@@ -305,7 +211,7 @@ function App() {
                 <SelectValue placeholder="Filtrar por status" />
               </SelectTrigger>
               <SelectContent className="bg-gray-800 border-gray-600">
-                <SelectItem value="ONLINE" className="text-white">
+                <SelectItem value="TODOS" className="text-white">
                   Todos os status
                 </SelectItem>
                 <SelectItem value="ONLINE" className="text-white">
@@ -327,87 +233,12 @@ function App() {
           {/* Instances Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {filteredInstances.map((instance) => {
-              const statusInfo =
-                statusConfig[
-                  instance.connectionStatus as keyof typeof statusConfig
-                ];
-
               return (
-                <Card
+                <InstanceCard
                   key={instance.id}
-                  className="bg-gray-800 border-gray-700 hover:bg-gray-750 transition-colors"
-                >
-                  <CardContent className="p-4">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex items-center gap-3">
-                        <div className="relative">
-                          <div
-                            className={`absolute -bottom-1 -right-1 w-4 h-4 ${statusInfo.color} rounded-full border-2 border-gray-800`}
-                          />
-                        </div>
-                        <div>
-                          <h3 className="font-medium text-white truncate max-w-32">
-                            {instance.name}
-                          </h3>
-                          <p className="text-xs text-gray-400 truncate max-w-32">
-                            {instance.id}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between mb-3">
-                      <Badge
-                        variant="secondary"
-                        className={`${statusInfo.bgColor} ${statusInfo.textColor} text-xs`}
-                      >
-                        {statusInfo.label}
-                      </Badge>
-                      {instance.createdAt && (
-                        <span className="text-xs text-gray-500">
-                          {instance.createdAt}
-                        </span>
-                      )}
-                    </div>
-
-                    <Separator className="bg-gray-700 mb-3" />
-
-                    <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="flex-1 border-gray-600 text-gray-300 hover:bg-gray-700"
-                        onClick={() =>
-                          handleInstanceAction(
-                            instance.id,
-                            instance.connectionStatus === "ONLINE"
-                              ? "stop"
-                              : "start"
-                          )
-                        }
-                      >
-                        {instance.connectionStatus === "ONLINE" ? (
-                          <Square className="w-3 h-3 mr-1" />
-                        ) : (
-                          <Play className="w-3 h-3 mr-1" />
-                        )}
-                        {instance.connectionStatus === "ONLINE"
-                          ? "Parar"
-                          : "Iniciar"}
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="border-red-600 text-red-400 hover:bg-red-600 hover:text-white"
-                        onClick={() =>
-                          handleInstanceAction(instance.id, "delete")
-                        }
-                      >
-                        <Trash2 className="w-3 h-3" />
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
+                  instance={instance}
+                  handleInstanceAction={handleInstanceAction}
+                />
               );
             })}
           </div>

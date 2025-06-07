@@ -5,6 +5,32 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+export const statusConfig = {
+  ONLINE: {
+    label: "Conectado",
+    color: "bg-green-500",
+    textColor: "text-green-700",
+    bgColor: "bg-green-50",
+  },
+  OFFLINE: {
+    label: "Desconectado",
+    color: "bg-red-500",
+    textColor: "text-red-700",
+    bgColor: "bg-red-50",
+  },
+  ERROR: {
+    label: "Erro",
+    color: "bg-red-500",
+    textColor: "text-red-700",
+    bgColor: "bg-red-50",
+  },
+  CONNECTING: {
+    label: "Conectando",
+    color: "bg-yellow-500",
+    textColor: "text-yellow-700",
+    bgColor: "bg-yellow-50",
+  },
+};
 export interface Instance {
   id: number;
   name: string;
